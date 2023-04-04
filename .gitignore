@@ -1,12 +1,11 @@
 ### IntelliJ IDEA ###
 out/
-.idea/
-.idea/misc.xml
-Team-Crap-Project-3.iml
-
-
 !**/src/main/**/out/
 !**/src/test/**/out/
+.idea
+.idea/
+Team-Crap-Project-3.iml
+.idea/workspace.xml
 
 ### Eclipse ###
 .apt_generated
