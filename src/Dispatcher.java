@@ -2,6 +2,7 @@ import java.util.Queue;
 import java.util.concurrent.Semaphore;
 public class Dispatcher implements Runnable {
     static Queue<Thread> readyQueue;
+    static Semaphore RQ;
     static Semaphore[] dispatcher;
 
     public Dispatcher() {
@@ -9,7 +10,7 @@ public class Dispatcher implements Runnable {
     }
 
     private static void FCFS(Queue<Thread> readyQueue) {
-        while(!readyQueue.isEmpty()) {
+        while(true) {
 
         }
     }

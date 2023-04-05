@@ -1,9 +1,9 @@
 import java.util.concurrent.Semaphore;
 
 public class Task implements Runnable{
-    int taskID;
-    int maxBurst;
-    int remainingBurst = 0;
+    public final int taskID;
+    public final int maxBurst;
+    private int remainingBurst = 0;
     static Semaphore[] taskStart;
     static Semaphore[] taskFinished;
 

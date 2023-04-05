@@ -18,6 +18,7 @@ public class Main {
 
         int C = 1; // Number Cores
 
+        Semaphore RQ = new Semaphore(1);
         Semaphore[] dispatcher = new Semaphore[C];
         Semaphore[] CPU = new Semaphore[C];
         Semaphore[] taskStart = new Semaphore[T];
@@ -31,6 +32,7 @@ public class Main {
             taskFinished[i] = new Semaphore(0);
         }
 
+        Dispatcher.RQ = RQ;
         Dispatcher.dispatcher = dispatcher;
         cpuCore.CPU = CPU;
         Task.taskStart = taskStart;
