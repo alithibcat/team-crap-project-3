@@ -9,9 +9,21 @@ public class Dispatcher implements Runnable {
 
     }
 
-    private static void FCFS(Queue<Thread> readyQueue) {
-        while(true) {
+    private static void FCFS(Queue<Thread> readyQueue) throws InterruptedException {
+        while(!readyQueue.isEmpty()) {
+            //Protect the Ready Queue, so only one dispatcher
+            //goes at a time
+            RQ.acquire();
+            // 1.) Access and loop through the ready queue
+            // to find the next Task to run
+            // (based on scheduling algorithm)
+            for(int i = 0; i < dispatcher.length; i++){
+                dispatcher[i].acquire();
 
+                cpuCore.CPU[i].release();
+            }
+
+            RQ.release();
         }
     }
 
