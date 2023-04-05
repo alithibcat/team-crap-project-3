@@ -12,6 +12,18 @@ public class Task implements Runnable{
         this.maxBurst = maxBurst;
     }
 
+    public int getTaskID() {
+        return taskID;
+    }
+
+    public int getMaxBurst() {
+        return maxBurst;
+    }
+
+    public int getRemainingBurst() {
+        return remainingBurst;
+    }
+
     @Override
     public void run() {
 //        System.out.println("Thread " + threadNum + "  | On CPU: MB="
