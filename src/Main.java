@@ -7,15 +7,7 @@ public class Main {
 
         //thread creation and population of RQ by Collin
         int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
-        Queue<Thread> readyQueue = new LinkedList<>();
-        for(int i = 0; i < T; i++){
-            int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
-            Task task = new Task(i,B);
-            Thread thread = new Thread(task);
-            readyQueue.add(thread);
-        }
-        Dispatcher.readyQueue = readyQueue;
-
+        System.out.println("Task Threads: " + T);
         int C = 1; // Number Cores
 
         Semaphore RQ = new Semaphore(1);
@@ -37,5 +29,21 @@ public class Main {
         cpuCore.CPU = CPU;
         Task.taskStart = taskStart;
         Task.taskFinished = taskFinished;
+
+        Queue<Thread> readyQueue = new LinkedList<>();
+        for (int i = 0; i < T; i++){
+            int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
+            Task task = new Task(i,B);
+            Thread thread = new Thread(task);
+            readyQueue.add(thread);
+            thread.start();
+        }
+        Dispatcher.readyQueue = readyQueue;
+
+        for (int i = 0; i < C; i++) {
+            cpuCore cpuCore = new cpuCore(i);
+            Thread thread = new Thread(cpuCore);
+            thread.start();
+        }
     }
 }
