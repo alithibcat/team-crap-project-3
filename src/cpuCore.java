@@ -1,3 +1,4 @@
+import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 public class cpuCore implements Runnable{
@@ -9,6 +10,8 @@ public class cpuCore implements Runnable{
 
     @Override
     public void run() {
+        while(!Dispatcher.readyQueue.isEmpty()) {
 
+        }
     }
 }
