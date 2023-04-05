@@ -1,8 +1,7 @@
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 public class Dispatcher implements Runnable {
-
-    Semaphore dispatcher = new Semaphore(1);
+    static Semaphore[] dispatcher;
 
     public Dispatcher(Queue<Thread> readyQueue) {
 
