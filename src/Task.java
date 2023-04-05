@@ -1,6 +1,6 @@
 public class Task implements Runnable{
 
-    public Task() {
+    public Task(int threadNum) {
 
     }
 
