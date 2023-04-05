@@ -5,13 +5,13 @@ public class Dispatcher implements Runnable {
     Semaphore dispatcher = new Semaphore(1);
 
     public Dispatcher(Queue<Thread> readyQueue) {
+
+    }
+
+    private static void FCFS(Queue<Thread> readyQueue) {
         while(!readyQueue.isEmpty()){
 
         }
-    }
-
-    private static void FCFS() {
-
     }
 
     private static void RR() {
