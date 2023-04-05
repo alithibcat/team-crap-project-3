@@ -1,14 +1,15 @@
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 public class Dispatcher implements Runnable {
+    static Queue<Thread> readyQueue;
     static Semaphore[] dispatcher;
 
-    public Dispatcher(Queue<Thread> readyQueue) {
+    public Dispatcher() {
 
     }
 
     private static void FCFS(Queue<Thread> readyQueue) {
-        while(!readyQueue.isEmpty()){
+        while(!readyQueue.isEmpty()) {
 
         }
     }

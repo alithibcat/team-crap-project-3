@@ -14,6 +14,8 @@ public class Main {
             Thread thread = new Thread(task);
             readyQueue.add(thread);
         }
+        Dispatcher.readyQueue = readyQueue;
+
         int C = 1; // Number Cores
 
         Semaphore[] dispatcher = new Semaphore[C];

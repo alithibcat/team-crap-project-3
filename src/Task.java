@@ -10,7 +10,6 @@ public class Task implements Runnable{
     public Task(int taskID, int maxBurst) {
         this.taskID = taskID;
         this.maxBurst = maxBurst;
-        //this.timeQuantum = maxBurst;
     }
 
     @Override
@@ -18,7 +17,7 @@ public class Task implements Runnable{
 //        System.out.println("Thread " + threadNum + "  | On CPU: MB="
 //                + maxBurst /*+ ", CB=" + currentBurst + ", BT=" + timeQuantum
 //                + ", BG= ????"*/);
-        while (remainingBurst <= maxBurst){
+        while (remainingBurst <= maxBurst) {
             try {
                 taskStart[taskID].acquire();
             } catch (InterruptedException e) {
