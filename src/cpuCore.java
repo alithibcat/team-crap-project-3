@@ -2,7 +2,7 @@ import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 public class cpuCore implements Runnable{
-    private final int CPUID;
+    private final int CPUID; // Same as dispatcher ID
     static Semaphore[] CPU;
 
     public cpuCore(int CPUID) {
@@ -20,8 +20,12 @@ public class cpuCore implements Runnable{
 
             // update assigned task's allotted burst
 
-            Task.taskStart[taskID].release();
-            Task.taskFinished[taskID].acquire();
+            Task.taskStart[targetTask.getID].release();
+            try {
+                Task.taskFinished[targetTask.getID].acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             Dispatcher.dispatcher[CPUID].release();
 
             // Check if all tasks are finished
