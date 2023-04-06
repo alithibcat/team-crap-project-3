@@ -1,5 +1,4 @@
-import java.util.Queue;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class Main {
@@ -30,15 +29,23 @@ public class Main {
         Task.taskStart = taskStart;
         Task.taskFinished = taskFinished;
 
-        Queue<Thread> readyQueue = new LinkedList<>();
+
+        //Side note, perhaps to use ArrayList to test later if it's easier
+        ArrayList<Task> readyQueue = new ArrayList<>();
+
+        //Queue is just only good for FCFS, not good for the rest of the algo
+        //Queue<Task> readyQueue = new Queue<Task>()
+
+        //Start the task and burst time
         for (int i = 0; i < T; i++){
             int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
             Task task = new Task(i,B);
             Thread thread = new Thread(task);
-            readyQueue.add(thread);
+            readyQueue.add(task);
             thread.start();
         }
         Dispatcher.readyQueue = readyQueue;
+        cpuCore.readyQueue = readyQueue;
 
         for (int i = 0; i < C; i++) {
             cpuCore cpuCore = new cpuCore(i);

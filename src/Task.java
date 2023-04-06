@@ -4,8 +4,8 @@ public class Task implements Runnable{
     public final int taskID;
     public final int maxBurst;
     private int remainingBurst;
-    static Semaphore[] taskStart;
-    static Semaphore[] taskFinished;
+    public static Semaphore[] taskStart;
+    public static Semaphore[] taskFinished;
 
     public Task(int taskID, int maxBurst) {
         this.taskID = taskID;

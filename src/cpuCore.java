@@ -1,9 +1,11 @@
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 public class cpuCore implements Runnable{
+    static ArrayList<Task> readyQueue;
     private final int CPUID; // Same as dispatcher ID
-    static Semaphore[] CPU;
+    public static Semaphore[] CPU;
 
     public cpuCore(int CPUID) {
         this.CPUID = CPUID;
@@ -19,8 +21,10 @@ public class cpuCore implements Runnable{
             }
 
             // update assigned task's allotted burst
+            //Not looping, just one for there rn
+            Task.taskStart[readyQueue.get(1).getTaskID()].release();
 
-            Task.taskStart[targetTask.getID].release();
+
             try {
                 Task.taskFinished[targetTask.getID].acquire();
             } catch (InterruptedException e) {
