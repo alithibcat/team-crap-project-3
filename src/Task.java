@@ -29,13 +29,13 @@ public class Task implements Runnable{
 
     @Override
     public void run() {
-        while (remainingBurst > 0) {
+        while (remainingBurst > 0) { // While task still needs to run
             try {
                 taskStart[taskID].acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("Task " + taskID + " has run for a round.");
+            System.out.println("Task " + taskID + " runs.");
             remainingBurst--;
             taskFinished[taskID].release();
         }

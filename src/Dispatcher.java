@@ -11,14 +11,17 @@ public class Dispatcher implements Runnable {
     }
 
     private static void FCFS(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
-        // 1) Access ready queue to get next Task to run
-        // 2) Decide the allotted burst for this Task
-        int taskID = readyQueue.get(0).getTaskID(); //grab the task ID
+        // Get first task on ready queue, remove task from ready queue, start and finish task
+        int taskID = readyQueue.get(0).getTaskID(); // grab the task ID
         int taskMB = readyQueue.get(0).getMaxBurst(); // grab the task Burst time
+        readyQueue.remove(0);
 
         // Update burst info ...
 
+
         // Task start
+        System.out.println("Dispatcher " + dispID + "    | Running process " + taskID);
+        System.out.println("Process " + taskID + "On CPU: MB=" + taskMB);
         Task.taskStart[taskID].release();
         // Task finish
         try {
@@ -58,7 +61,6 @@ public class Dispatcher implements Runnable {
                 Task.remainingTasksSem.release();
                 break;
             }
-
 
             // call algorithm to decide what task to run
 
