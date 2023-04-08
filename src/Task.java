@@ -1,6 +1,8 @@
 import java.util.concurrent.Semaphore;
 
 public class Task implements Runnable{
+    public static int remainingTasks;
+    public static Semaphore remainingTasksSem;
     public final int taskID;
     public final int maxBurst;
     private int remainingBurst;
@@ -27,9 +29,6 @@ public class Task implements Runnable{
 
     @Override
     public void run() {
-//        System.out.println("Thread " + threadNum + "  | On CPU: MB="
-//                + maxBurst /*+ ", CB=" + currentBurst + ", BT=" + timeQuantum
-//                + ", BG= ????"*/);
         while (remainingBurst > 0) {
             try {
                 taskStart[taskID].acquire();
@@ -40,5 +39,13 @@ public class Task implements Runnable{
             remainingBurst--;
             taskFinished[taskID].release();
         }
+        // Update remaining tasks
+        try {
+            remainingTasksSem.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        remainingTasks--;
+        remainingTasksSem.release();
     }
 }

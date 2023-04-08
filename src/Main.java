@@ -10,25 +10,19 @@ public class Main {
         int C = 1; // Number Cores
 
         Semaphore RQ = new Semaphore(1);
-        Semaphore[] dispatcher = new Semaphore[C];
-        Semaphore[] CPU = new Semaphore[C];
         Semaphore[] taskStart = new Semaphore[T];
         Semaphore[] taskFinished = new Semaphore[T];
-        for (int i = 0; i < C; i++) {
-            dispatcher[i] = new Semaphore(1);
-            CPU[i] = new Semaphore(0);
-        }
+        Semaphore remainingTasksSem = new Semaphore(1);
         for (int i = 0; i < T; i++) {
             taskStart[i] = new Semaphore(0);
             taskFinished[i] = new Semaphore(0);
         }
 
         Dispatcher.RQ = RQ;
-        Dispatcher.dispatcher = dispatcher;
-        cpuCore.CPU = CPU;
+        Task.remainingTasks = T;
         Task.taskStart = taskStart;
         Task.taskFinished = taskFinished;
-
+        Task.remainingTasksSem = remainingTasksSem;
 
         //Side note, perhaps to use ArrayList to test later if it's easier
         ArrayList<Task> readyQueue = new ArrayList<>();
@@ -36,20 +30,21 @@ public class Main {
         //Queue is just only good for FCFS, not good for the rest of the algo
         //Queue<Task> readyQueue = new Queue<Task>()
 
-        //Start the task and burst time
+        //Start tasks and add them to ready queue
         for (int i = 0; i < T; i++){
             int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
             Task task = new Task(i,B);
             Thread thread = new Thread(task);
+            // If PSJF, randomize ready queue
             readyQueue.add(task);
             thread.start();
         }
         Dispatcher.readyQueue = readyQueue;
-        cpuCore.readyQueue = readyQueue;
 
+        //Start dispatchers
         for (int i = 0; i < C; i++) {
-            cpuCore cpuCore = new cpuCore(i);
-            Thread thread = new Thread(cpuCore);
+            Dispatcher disp = new Dispatcher(i);
+            Thread thread = new Thread(disp);
             thread.start();
         }
     }
