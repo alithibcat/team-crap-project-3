@@ -6,8 +6,10 @@ public class Dispatcher implements Runnable {
     static ArrayList<Task> readyQueue;
     static Semaphore RQ;
     static Semaphore[] dispatcher;
+    int dispID;
 
     public Dispatcher(int dispID) {
+        this.dispID = dispID;
     }
 
     private static void FCFS(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
@@ -60,6 +62,12 @@ public class Dispatcher implements Runnable {
             if (Task.remainingTasks == 0) { // If no more processes to run
                 Task.remainingTasksSem.release();
                 break;
+            }
+
+            try {
+                FCFS(readyQueue, dispID);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
             // call algorithm to decide what task to run
