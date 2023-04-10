@@ -5,7 +5,7 @@ import java.util.concurrent.Semaphore;
 public class Dispatcher implements Runnable {
     static ArrayList<Task> readyQueue;
     static Semaphore RQ;
-    static Semaphore[] dispatcher;
+    static Semaphore[] dispSem;
     int dispID;
 
     public Dispatcher(int dispID) {
@@ -19,7 +19,7 @@ public class Dispatcher implements Runnable {
             throw new RuntimeException(e);
         }
         if (readyQueue.isEmpty()) {
-            Dispatcher.dispatcher[dispID].release();
+            Dispatcher.dispSem[dispID].release();
             return;
         }
         // Get first task on ready queue, remove task from ready queue, start and finish task
@@ -41,7 +41,7 @@ public class Dispatcher implements Runnable {
                 throw new RuntimeException(e);
             }
         }
-        Dispatcher.dispatcher[dispID].release();
+        Dispatcher.dispSem[dispID].release();
     }
 
     private static void RR() {
@@ -60,7 +60,7 @@ public class Dispatcher implements Runnable {
     public void run() {
         while(true) {
             try { // Start this dispatcher
-                dispatcher[dispID].acquire();
+                dispSem[dispID].acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
