@@ -24,7 +24,7 @@ public class Dispatcher implements Runnable {
         int taskMB = readyQueue.get(0).getMaxBurst(); // grab the task Burst time
         readyQueue.remove(0);
         RQ.release();
-        Task.currentDispID = dispID;
+        Task.currentDispID[taskID] = dispID;
         // Task start
         System.out.println("Dispatcher " + dispID + " | Running process " + taskID);
         System.out.println("Process " + taskID + "   | On CPU: MB=" + taskMB
@@ -56,12 +56,6 @@ public class Dispatcher implements Runnable {
     @Override
     public void run() {
         while(true) {
-            try { // Start this dispatcher
-                dispatcher[dispID].acquire();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
             try { // Check remaining Tasks
                 Task.remainingTasksSem.acquire();
             } catch (InterruptedException e) {
@@ -72,6 +66,12 @@ public class Dispatcher implements Runnable {
                 break;
             }
             Task.remainingTasksSem.release();
+
+            try { // Start this dispatcher
+                dispatcher[dispID].acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
             // Use one algorithm to choose task to run
             FCFS(readyQueue, dispID);
