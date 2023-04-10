@@ -18,13 +18,15 @@ public class Dispatcher implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        if (readyQueue.isEmpty()) return;
+        if (readyQueue.isEmpty()) {
+            Dispatcher.dispatcher[dispID].release();
+            return;
+        }
         // Get first task on ready queue, remove task from ready queue, start and finish task
         int taskID = readyQueue.get(0).getTaskID(); // grab the task ID
         int taskMB = readyQueue.get(0).getMaxBurst(); // grab the task Burst time
         readyQueue.remove(0);
         RQ.release();
-        Task.currentDispID[taskID] = dispID;
         // Task start
         System.out.println("Dispatcher " + dispID + " | Running process " + taskID);
         System.out.println("Process " + taskID + "   | On CPU: MB=" + taskMB
@@ -39,6 +41,7 @@ public class Dispatcher implements Runnable {
                 throw new RuntimeException(e);
             }
         }
+        Dispatcher.dispatcher[dispID].release();
     }
 
     private static void RR() {
@@ -56,25 +59,27 @@ public class Dispatcher implements Runnable {
     @Override
     public void run() {
         while(true) {
-            try { // Check remaining Tasks
-                Task.remainingTasksSem.acquire();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            if (Task.remainingTasks == 0) { // If no more processes to run, stop dispatcher
-                Task.remainingTasksSem.release();
-                break;
-            }
-            Task.remainingTasksSem.release();
-
             try { // Start this dispatcher
                 dispatcher[dispID].acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
+            try { // Check remaining Tasks
+                Task.remainingTasksSem.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println(Task.remainingTasks);
+            if (Task.remainingTasks == 0) { // If no more processes to run, stop dispatcher
+                Task.remainingTasksSem.release();
+                break;
+            }
+            Task.remainingTasksSem.release();
+
             // Use one algorithm to choose task to run
             FCFS(readyQueue, dispID);
         }
+        System.out.println("Dispatcher " + dispID + " is DONE");
     }
 }

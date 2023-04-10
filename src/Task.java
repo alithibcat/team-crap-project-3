@@ -40,7 +40,6 @@ public class Task implements Runnable{
             remainingBurst--;
             taskFinished[taskID].release();
         }
-        Dispatcher.dispatcher[currentDispID[taskID]].release(); // Task has no more bursts to run
         // Update remaining tasks
         try {
             remainingTasksSem.acquire();
