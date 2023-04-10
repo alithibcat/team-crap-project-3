@@ -6,12 +6,12 @@ public class Main {
 
         //thread creation and population of RQ by Collin
         int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
-        int C = 2; // Number Cores
+        int C = 3; // Number Cores
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
         int[] currentDispID = new int[T];
         Semaphore RQ = new Semaphore(1);
-        Semaphore[] dispatcher = new Semaphore[C];
+        Semaphore[] dispSem = new Semaphore[C];
         Semaphore[] taskStart = new Semaphore[T];
         Semaphore[] taskFinished = new Semaphore[T];
         Semaphore remainingTasksSem = new Semaphore(1);
@@ -20,10 +20,10 @@ public class Main {
             taskFinished[i] = new Semaphore(0);
         }
         for (int i = 0; i < C; i++)
-            dispatcher[i] = new Semaphore(1);
+            dispSem[i] = new Semaphore(1);
 
         Dispatcher.RQ = RQ;
-        Dispatcher.dispatcher = dispatcher;
+        Dispatcher.dispSem = dispSem;
         Task.taskStart = taskStart;
         Task.taskFinished = taskFinished;
         Task.remainingTasksSem = remainingTasksSem;
