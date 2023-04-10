@@ -13,6 +13,7 @@ public class Dispatcher implements Runnable {
     }
 
     private static void FCFS(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
+        if (readyQueue.isEmpty()) return;
         // Get first task on ready queue, remove task from ready queue, start and finish task
         int taskID = readyQueue.get(0).getTaskID(); // grab the task ID
         int taskMB = readyQueue.get(0).getMaxBurst(); // grab the task Burst time
@@ -24,12 +25,14 @@ public class Dispatcher implements Runnable {
         // Task start
         System.out.println("Dispatcher " + dispID + "    | Running process " + taskID);
         System.out.println("Process " + taskID + " On CPU: MB=" + taskMB);
-        Task.taskStart[taskID].release();
-        // Task finish
-        try {
-            Task.taskFinished[taskID].acquire();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        for (int i = 0; i < taskMB; i++) {
+            Task.taskStart[taskID].release();
+            // Task finish
+            try {
+                Task.taskFinished[taskID].acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -62,7 +65,8 @@ public class Dispatcher implements Runnable {
             if (Task.remainingTasks == 0) { // If no more processes to run
                 Task.remainingTasksSem.release();
                 break;
-            } else Task.remainingTasksSem.release();
+            }
+            Task.remainingTasksSem.release();
 
             try { // Acquire Ready Queue
                 RQ.acquire();
