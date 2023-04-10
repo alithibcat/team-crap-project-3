@@ -9,6 +9,7 @@ public class Main {
         int C = 1; // Number Cores
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
+        int currentDispID = 0;
         Semaphore RQ = new Semaphore(1);
         Semaphore[] dispatcher = new Semaphore[C];
         Semaphore[] taskStart = new Semaphore[T];
@@ -27,6 +28,7 @@ public class Main {
         Task.taskFinished = taskFinished;
         Task.remainingTasksSem = remainingTasksSem;
         Task.remainingTasks = T;
+        Task.currentDispID = currentDispID;
 
         //Side note, perhaps to use ArrayList to test later if it's easier
         ArrayList<Task> readyQueue = new ArrayList<>();
