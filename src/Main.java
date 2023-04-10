@@ -6,9 +6,10 @@ public class Main {
 
         //thread creation and population of RQ by Collin
         int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
-        int C = 1; // Number Cores
+        int C = 2; // Number Cores
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
+        int currentDispID = 0;
         Semaphore RQ = new Semaphore(1);
         Semaphore[] dispatcher = new Semaphore[C];
         Semaphore[] taskStart = new Semaphore[T];
@@ -27,6 +28,7 @@ public class Main {
         Task.taskFinished = taskFinished;
         Task.remainingTasksSem = remainingTasksSem;
         Task.remainingTasks = T;
+        Task.currentDispID = currentDispID;
 
         //Side note, perhaps to use ArrayList to test later if it's easier
         ArrayList<Task> readyQueue = new ArrayList<>();
