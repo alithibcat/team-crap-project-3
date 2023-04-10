@@ -9,7 +9,7 @@ public class Main {
         int C = 2; // Number Cores
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
-        int currentDispID = 0;
+        int[] currentDispID = new int[T];
         Semaphore RQ = new Semaphore(1);
         Semaphore[] dispatcher = new Semaphore[C];
         Semaphore[] taskStart = new Semaphore[T];

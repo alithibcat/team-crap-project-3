@@ -3,7 +3,7 @@ import java.util.concurrent.Semaphore;
 public class Task implements Runnable{
     public static int remainingTasks;
     public static Semaphore remainingTasksSem;
-    public static int currentDispID;
+    public static int currentDispID[];
     public final int taskID;
     public final int maxBurst;
     private int remainingBurst;
@@ -39,8 +39,8 @@ public class Task implements Runnable{
             //System.out.println("Task " + taskID + " runs.");
             remainingBurst--;
             taskFinished[taskID].release();
-            Dispatcher.dispatcher[currentDispID].release();
         }
+        Dispatcher.dispatcher[currentDispID[taskID]].release(); // Task has no more bursts to run
         // Update remaining tasks
         try {
             remainingTasksSem.acquire();
