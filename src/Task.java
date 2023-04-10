@@ -38,6 +38,7 @@ public class Task implements Runnable{
             System.out.println("Task " + taskID + " runs.");
             remainingBurst--;
             taskFinished[taskID].release();
+            Dispatcher.dispatcher[0].release();
         }
         // Update remaining tasks
         try {

@@ -17,13 +17,13 @@ public class Dispatcher implements Runnable {
         int taskID = readyQueue.get(0).getTaskID(); // grab the task ID
         int taskMB = readyQueue.get(0).getMaxBurst(); // grab the task Burst time
         readyQueue.remove(0);
-
+        RQ.release();
         // Update burst info ...
 
 
         // Task start
         System.out.println("Dispatcher " + dispID + "    | Running process " + taskID);
-        System.out.println("Process " + taskID + "On CPU: MB=" + taskMB);
+        System.out.println("Process " + taskID + " On CPU: MB=" + taskMB);
         Task.taskStart[taskID].release();
         // Task finish
         try {
@@ -48,8 +48,8 @@ public class Dispatcher implements Runnable {
     @Override
     public void run() {
         while(true) {
-            try { // Acquire Ready Queue
-                RQ.acquire();
+            try { // Start this dispatcher
+                dispatcher[0].acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -62,6 +62,12 @@ public class Dispatcher implements Runnable {
             if (Task.remainingTasks == 0) { // If no more processes to run
                 Task.remainingTasksSem.release();
                 break;
+            } else Task.remainingTasksSem.release();
+
+            try { // Acquire Ready Queue
+                RQ.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
             try {
@@ -72,7 +78,7 @@ public class Dispatcher implements Runnable {
 
             // call algorithm to decide what task to run
 
-            RQ.release();
+            //RQ.release();
         }
     }
 }
