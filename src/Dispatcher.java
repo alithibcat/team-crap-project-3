@@ -1,12 +1,11 @@
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Queue;
 import java.util.concurrent.Semaphore;
 public class Dispatcher implements Runnable {
     static ArrayList<Task> readyQueue;
     static Semaphore RQ;
     static Semaphore[] dispSem;
     int dispID;
+
     static int C;
 
     public Dispatcher(int dispID) {
@@ -79,7 +78,9 @@ public class Dispatcher implements Runnable {
             for(int i = 0; i < C; i++){
                 barrierSemHold.release();
             }
+            System.out.println("All Dispatchers are DONE!");
             barrierMutex.release();
+
         }
         else{
             barrierMutex.release();
@@ -103,11 +104,6 @@ public class Dispatcher implements Runnable {
             }
             if (Task.remainingTasks == 0) { // If no more processes to run, stop dispatcher
                 Task.remainingTasksSem.release();
-                try {
-                    barrier();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
                 break;
             }
             Task.remainingTasksSem.release();
@@ -115,6 +111,11 @@ public class Dispatcher implements Runnable {
             // Use one algorithm to choose task to run
             FCFS(readyQueue, dispID);
         }
-        System.out.println("Dispatcher " + dispID + " is DONE");
+        //System.out.println("Dispatcher " + dispID + " is DONE");
+        try {
+            barrier();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
