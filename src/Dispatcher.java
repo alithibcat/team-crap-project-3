@@ -19,7 +19,8 @@ public class Dispatcher implements Runnable {
             throw new RuntimeException(e);
         }
         if (readyQueue.isEmpty()) {
-            Dispatcher.dispSem[dispID].release();
+            RQ.release();
+            dispSem[dispID].release();
             return;
         }
         // Get first task on ready queue, remove task from ready queue, start and finish task
@@ -41,7 +42,16 @@ public class Dispatcher implements Runnable {
                 throw new RuntimeException(e);
             }
         }
-        Dispatcher.dispSem[dispID].release();
+        // Update remaining tasks
+        try {
+            Task.remainingTasksSem.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Task.remainingTasks--;
+        Task.remainingTasksSem.release();
+        // Let dispatcher work on another process
+        dispSem[dispID].release();
     }
 
     private static void RR() {
@@ -70,7 +80,6 @@ public class Dispatcher implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println(Task.remainingTasks);
             if (Task.remainingTasks == 0) { // If no more processes to run, stop dispatcher
                 Task.remainingTasksSem.release();
                 break;

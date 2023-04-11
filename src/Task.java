@@ -30,23 +30,14 @@ public class Task implements Runnable{
 
     @Override
     public void run() {
-        while (remainingBurst > 0) { // While task still needs to run
+        while (remainingBurst > 0) { // While task still needs to run, do a single burst
             try {
                 taskStart[taskID].acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            //System.out.println("Task " + taskID + " runs.");
             remainingBurst--;
             taskFinished[taskID].release();
         }
-        // Update remaining tasks
-        try {
-            remainingTasksSem.acquire();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        remainingTasks--;
-        remainingTasksSem.release();
     }
 }
