@@ -7,6 +7,7 @@ public class Dispatcher implements Runnable {
     static Semaphore RQ;
     static Semaphore[] dispSem;
     int dispID;
+    static int C;
 
     public Dispatcher(int dispID) {
         this.dispID = dispID;
@@ -56,6 +57,26 @@ public class Dispatcher implements Runnable {
 
     }
 
+    static Semaphore barrierMutex = new Semaphore(1);
+    static Semaphore barrierSemHold = new Semaphore(0);
+    static int barrierThreadCount = 0;
+
+    public void barrier() throws InterruptedException{
+        barrierMutex.acquire();
+        barrierThreadCount++;
+        if(barrierThreadCount == C){
+            // the last thread wakes up all previous threads
+            for(int i = 0; i < C; i++){
+                barrierSemHold.release();
+            }
+            barrierMutex.release();
+        }
+        else{
+            barrierMutex.release();
+            barrierSemHold.acquire();
+        }
+    }
+
     @Override
     public void run() {
         while(true) {
@@ -73,6 +94,11 @@ public class Dispatcher implements Runnable {
             System.out.println(Task.remainingTasks);
             if (Task.remainingTasks == 0) { // If no more processes to run, stop dispatcher
                 Task.remainingTasksSem.release();
+                try {
+                    barrier();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             }
             Task.remainingTasksSem.release();

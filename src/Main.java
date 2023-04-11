@@ -6,7 +6,7 @@ public class Main {
 
         //thread creation and population of RQ by Collin
         int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
-        int C = 3; // Number Cores
+        int C = 2; // Number Cores
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
         int[] currentDispID = new int[T];
@@ -24,6 +24,7 @@ public class Main {
 
         Dispatcher.RQ = RQ;
         Dispatcher.dispSem = dispSem;
+        Dispatcher.C = C;
         Task.taskStart = taskStart;
         Task.taskFinished = taskFinished;
         Task.remainingTasksSem = remainingTasksSem;
