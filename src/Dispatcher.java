@@ -7,6 +7,7 @@ public class Dispatcher implements Runnable {
     int dispID;
 
     static int C;
+    static int quantumTime;
 
     public Dispatcher(int dispID) {
         this.dispID = dispID;
@@ -54,7 +55,7 @@ public class Dispatcher implements Runnable {
         dispSem[dispID].release();
     }
 
-    private static void RR() {
+    private static void RR(ArrayList<Task> readyQueue, int dispatcherID, int quantumTime) {
 
     }
 
