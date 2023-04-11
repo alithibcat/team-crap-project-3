@@ -37,9 +37,9 @@ public class Dispatcher implements Runnable {
         // Task start
         System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
                 + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
-                            + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
+                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
         for (int i = 0; i < taskMB; i++) {
-            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (i+1));
+            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (i + 1));
             Task.taskStart[taskID].release();
             // Task finish
             try {
@@ -75,27 +75,28 @@ public class Dispatcher implements Runnable {
     public void barrierStart() throws InterruptedException {
         barrierMutex2.acquire();
         barrierThreadCount2++;
-        if(barrierThreadCount2 == C){
+        if (barrierThreadCount2 == C) {
             // the last thread wakes up all previous threads
             System.out.println("Dispatcher " + dispID + " | Now releasing dispatchers.\n");
-            for(int i = 0; i < C; i++)
+            for (int i = 0; i < C; i++)
                 barrierSemHold2.release();
             barrierMutex2.release();
-        } else{
+        } else {
             barrierMutex2.release();
             barrierSemHold2.acquire();
         }
     }
-    public void barrierEnd() throws InterruptedException{
+
+    public void barrierEnd() throws InterruptedException {
         barrierMutex.acquire();
         barrierThreadCount++;
-        if(barrierThreadCount == C){
+        if (barrierThreadCount == C) {
             // the last thread wakes up all previous threads
-            for(int i = 0; i < C; i++)
+            for (int i = 0; i < C; i++)
                 barrierSemHold.release();
             System.out.println("\nAll Dispatchers are DONE!");
             barrierMutex.release();
-        } else{
+        } else {
             barrierMutex.release();
             barrierSemHold.acquire();
         }
@@ -109,7 +110,7 @@ public class Dispatcher implements Runnable {
             throw new RuntimeException(e);
         }
         System.out.println("Dispatcher " + dispID + " | Running FCFS algorithm");
-        while(true) {
+        while (true) {
             try { // Start this dispatcher
                 dispSem[dispID].acquire();
             } catch (InterruptedException e) {
@@ -138,3 +139,5 @@ public class Dispatcher implements Runnable {
         }
     }
 }
+
+//
