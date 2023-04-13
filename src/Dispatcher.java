@@ -55,8 +55,47 @@ public class Dispatcher implements Runnable {
         dispSem[dispID].release();
     }
 
-    private static void RR(ArrayList<Task> readyQueue, int dispatcherID, int quantumTime) {
+    private static void RR(ArrayList<Task> readyQueue, int dispatcherID, int quantumTime) throws InterruptedException {
+        RQ.acquire();
 
+        if (readyQueue.isEmpty()) {
+            RQ.release();
+            dispSem[dispatcherID].release();
+            return;
+        }
+
+        // Get first task on ready queue, remove task from ready queue,
+        // run the task of quantum Time
+
+        // grab the task ID
+        int taskID = readyQueue.get(0).getTaskID();
+        // grab the task Burst time
+        int taskMB = readyQueue.get(0).getRemainingBurst();
+        Task t = readyQueue.remove(0);
+        RQ.release();
+
+        //Task Start, stops when quantum Time is completed
+        for(int i = 0; i < quantumTime; i++){
+            if (t.getRemainingBurst() >  0){
+                //Starting the task, releasing each one
+                Task.taskStart[taskID].release();
+            }
+            else{
+                //Task Finish
+                Task.taskFinished[taskID].acquire();
+            }
+        }
+
+        //Add Task back to the Ready Queue if it isn't finish
+        readyQueue.add(t);
+
+        //Update remaining tasks
+        Task.remainingTasksSem.acquire();
+
+        Task.remainingTasks--;
+        Task.remainingTasksSem.release();
+        //Let dispatcher work on another process
+        dispSem[dispatcherID].release();
     }
 
     private static void NSJF() {
