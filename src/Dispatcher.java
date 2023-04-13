@@ -68,8 +68,41 @@ public class Dispatcher implements Runnable {
 
     }
 
-    private static void PSJF() {
+    private static void PSJF(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
+        try { // Acquire Ready Queue
+            RQ.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if (readyQueue.isEmpty()) {
+            RQ.release();
+            dispSem[dispID].release();
+            return;
+        }
 
+        //find the task with the shortest burst time
+        int taskID;
+        int taskMB;
+        Task shortestTask = readyQueue.get(0);
+        for (int i = 0; i < readyQueue.size(); i++){
+            if (readyQueue.get(i).getRemainingBurst() < shortestTask.getRemainingBurst()){
+                shortestTask = readyQueue.get(i);
+            }
+        }
+        taskID = shortestTask.getTaskID();
+        taskMB = shortestTask.getMaxBurst();
+        readyQueue.remove(shortestTask);
+        RQ.release();
+
+        //task start
+        System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
+                + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
+                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
+
+        for(int i = 0; i < shortestTask.getRemainingBurst(); i++){
+            shortestTask.taskStart[taskID].release();
+            shortestTask.taskFinished[taskID].acquire();
+        }
     }
 
     public void barrierStart() throws InterruptedException {
