@@ -137,14 +137,32 @@ public class Dispatcher implements Runnable {
         readyQueue.remove(shortestTask);
         RQ.release();
 
-        //task start
         System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
                 + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
                 + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
 
+        boolean bool = false;
         for(int i = 0; i < shortestTask.getRemainingBurst(); i++){
+            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (i+1));
+            //task start
             shortestTask.taskStart[taskID].release();
+
+            //task finish
             shortestTask.taskFinished[taskID].acquire();
+            if(shortestTask.getRemainingBurst() != 0){
+                readyQueue.add(shortestTask);
+            }
+            for (int j = 0; j < readyQueue.size(); j++){
+                if (readyQueue.get(j).getRemainingBurst() < shortestTask.getRemainingBurst()){
+                    shortestTask = readyQueue.get(j);
+                    bool = true;
+                }
+            }
+            if (bool)
+                System.out.println("\n--------------- Ready Queue ---------------");
+            for (int k = 0; i < readyQueue.size(); i++)
+                System.out.println("ID:" + k + ", Max Burst:" + readyQueue.get(k).getMaxBurst() + ", Current Burst: " +(shortestTask.maxBurst - shortestTask.getRemainingBurst()));
+            System.out.println("-------------------------------------------\n");
         }
     }
 
@@ -206,10 +224,15 @@ public class Dispatcher implements Runnable {
             // Use one algorithm to choose task to run
             //FCFS(readyQueue, dispID);
             try {
-                RR(readyQueue, dispID, quantumTime);
+                PSJF(readyQueue, dispID);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            //try {
+            //    RR(readyQueue, dispID, quantumTime);
+            //} catch (InterruptedException e) {
+            //    throw new RuntimeException(e);
+            //}
         }
 
         try { // Print when all dispatchers have finished
