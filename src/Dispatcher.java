@@ -149,7 +149,12 @@ public class Dispatcher implements Runnable {
             Task.remainingTasksSem.release();
 
             // Use one algorithm to choose task to run
-            FCFS(readyQueue, dispID);
+            //FCFS(readyQueue, dispID);
+            try {
+                RR(readyQueue, dispID, quantumTime);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
         //System.out.println("Dispatcher " + dispID + " is DONE");
         try {
