@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) {
 
         //thread creation and population of RQ by Collin
-        int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
+        int T = 5;//(int) (Math.random() * (25 - 1) + 1); // Number Task Threads
         int C = 4; // Number Cores
         int quantumTime = 3; // Quantum Time
         System.out.println("Task Threads: " + T + "\nCores: " + C);
@@ -50,8 +50,9 @@ public class Main {
         //Start tasks and add them to ready queue
         for (int i = 0; i < T; i++) {
             int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
+            int A =  (int) (Math.random() * (50 - 1) + 1); // RQ Arrival Time
             System.out.println("Main thread  | Creating process thread " + i);
-            Task task = new Task(i,B);
+            Task task = new Task(i,B,A);
             Thread thread = new Thread(task);
             // If PSJF, randomize ready queue
             readyQueue.add(task);
@@ -61,7 +62,7 @@ public class Main {
 
         System.out.println("\n--------------- Ready Queue ---------------");
         for (int i = 0; i < T; i++)
-            System.out.println("ID:" + i + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:***");
+            System.out.println("ID:" + i + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:0");
         System.out.println("-------------------------------------------\n");
 
         //Start dispatchers

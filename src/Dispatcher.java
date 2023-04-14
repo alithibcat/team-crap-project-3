@@ -38,9 +38,9 @@ public class Dispatcher implements Runnable {
         // Task start
         System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
                 + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
-                            + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
+                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
         for (int i = 0; i < taskMB; i++) {
-            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (i+1));
+            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (i + 1));
             Task.taskStart[taskID].release();
             // Task finish
             try {
@@ -112,10 +112,13 @@ public class Dispatcher implements Runnable {
         dispSem[dispatcherID].release();
     }
 
+<<<<<<< HEAD
     private static void NSJF() {
 
     }
 
+=======
+>>>>>>> 38c810f44b61ebe1f6e62c7a71967949b4fcbc6b
     private static void NSJF(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
         try { // Acquire Ready Queue
             RQ.acquire();
@@ -139,6 +142,8 @@ public class Dispatcher implements Runnable {
         int taskMB = shortestTask.getMaxBurst();
         readyQueue.remove(shortestTask);
         RQ.release();
+<<<<<<< HEAD
+=======
         System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
                 + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
                 + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
@@ -158,30 +163,87 @@ public class Dispatcher implements Runnable {
         dispSem[dispID].release(); // Task finished normally
     }
 
+    private static void PSJF(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
+        if (readyQueue.isEmpty()) {
+            dispSem[dispID].release();
+            return;
+        }
+
+        //find the task with the shortest burst time
+        Task shortestTask = readyQueue.get(0);
+        for (int i = 0; i < readyQueue.size(); i++){
+            if (readyQueue.get(i).getRemainingBurst() < shortestTask.getRemainingBurst()){
+                shortestTask = readyQueue.get(i);
+            }
+        }
+        int taskID = shortestTask.getTaskID();
+        int taskMB = shortestTask.getMaxBurst();
+        readyQueue.remove(shortestTask);
+
+>>>>>>> 38c810f44b61ebe1f6e62c7a71967949b4fcbc6b
+        System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
+                + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
+                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
+
+<<<<<<< HEAD
+=======
+        boolean bool = false;
+>>>>>>> 38c810f44b61ebe1f6e62c7a71967949b4fcbc6b
+        while(shortestTask.getRemainingBurst() > 0){
+            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (shortestTask.getMaxBurst() - shortestTask.getRemainingBurst() + 1));
+            //task start
+            shortestTask.taskStart[taskID].release();
+
+            //task finish
+            shortestTask.taskFinished[taskID].acquire();
+
+<<<<<<< HEAD
+        }
+        Task.remainingTasksSem.acquire();
+        Task.remainingTasks--;
+        Task.remainingTasksSem.release();
+=======
+            for (int j = 0; j < readyQueue.size(); j++){ // Check if current task is no longer shortest task
+                if (readyQueue.get(j).getRemainingBurst() < shortestTask.getRemainingBurst())
+                    bool = true;
+            }
+            if (bool) {
+                if(shortestTask.getRemainingBurst() != 0) // If task not done when preempted
+                    readyQueue.add(shortestTask);
+                dispSem[dispID].release();
+                return;
+            }
+        }
+        Task.remainingTasks--;
+>>>>>>> 38c810f44b61ebe1f6e62c7a71967949b4fcbc6b
+        dispSem[dispID].release(); // Task finished normally
+    }
+
     public void barrierStart() throws InterruptedException {
         barrierMutex2.acquire();
         barrierThreadCount2++;
-        if(barrierThreadCount2 == C){
+        if (barrierThreadCount2 == C) {
             // the last thread wakes up all previous threads
             System.out.println("Dispatcher " + dispID + " | Now releasing dispatchers.\n");
-            for(int i = 0; i < C; i++)
+            for (int i = 0; i < C; i++)
                 barrierSemHold2.release();
             barrierMutex2.release();
-        } else{
+        } else {
             barrierMutex2.release();
             barrierSemHold2.acquire();
         }
     }
-    public void barrierEnd() throws InterruptedException{
+
+    public void barrierEnd() throws InterruptedException {
         barrierMutex.acquire();
         barrierThreadCount++;
-        if(barrierThreadCount == C){
+        if (barrierThreadCount == C) {
             // the last thread wakes up all previous threads
-            for(int i = 0; i < C; i++)
+            for (int i = 0; i < C; i++)
                 barrierSemHold.release();
             System.out.println("\nAll Dispatchers are DONE!");
             barrierMutex.release();
-        } else{
+        } else {
             barrierMutex.release();
             barrierSemHold.acquire();
         }
@@ -194,9 +256,14 @@ public class Dispatcher implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+<<<<<<< HEAD
         //System.out.println("Dispatcher " + dispID + " | Running FCFS algorithm");
         System.out.println("Dispatcher " + dispID + " | Running RR algorithm, Time Quantum = " + quantumTime);
         while(true) {
+=======
+        System.out.println("Dispatcher " + dispID + " | Running FCFS algorithm");
+        while (true) {
+>>>>>>> 38c810f44b61ebe1f6e62c7a71967949b4fcbc6b
             try { // Start this dispatcher
                 dispSem[dispID].acquire();
             } catch (InterruptedException e) {
@@ -215,13 +282,27 @@ public class Dispatcher implements Runnable {
             Task.remainingTasksSem.release();
 
             // Use one algorithm to choose task to run
-            //FCFS(readyQueue, dispID);
+            /*FCFS(readyQueue, dispID);
             try {
                 RR(readyQueue, dispID, quantumTime);
                 //PSJF(readyQueue, dispID);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+<<<<<<< HEAD
+=======
+             */
+            try {
+                NSJF(readyQueue, dispID);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //try {
+            //    RR(readyQueue, dispID, quantumTime);
+            //} catch (InterruptedException e) {
+            //    throw new RuntimeException(e);
+            //}
+>>>>>>> 38c810f44b61ebe1f6e62c7a71967949b4fcbc6b
         }
 
         try { // Print when all dispatchers have finished
@@ -231,3 +312,5 @@ public class Dispatcher implements Runnable {
         }
     }
 }
+
+//
