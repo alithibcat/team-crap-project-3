@@ -75,12 +75,15 @@ public class Dispatcher implements Runnable {
         RQ.release();
 
         //Task Start, stops when quantum Time is completed
+
+        System.out.println("Dispatcher " + dispatcherID + " | Running process " + taskID);
+        System.out.println("Process " + taskID + "   | On CPU: MB=" + taskMB
+                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
         for(int i = 0; i < quantumTime; i++){
             if (t.getRemainingBurst() >  0){
                 //Starting the task, releasing each one
                 Task.taskStart[taskID].release();
-            }
-            else{
+
                 //Task Finish
                 Task.taskFinished[taskID].acquire();
             }
