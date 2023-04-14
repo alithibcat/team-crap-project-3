@@ -101,14 +101,20 @@ public class Dispatcher implements Runnable {
         }
 
         //Add Task back to the Ready Queue if it isn't finish
-        readyQueue.add(t);
+        if(t.getRemainingBurst() > 0){
+            RQ.acquire();
+            readyQueue.add(t);
+            RQ.release();
+            //Let dispatcher work on another process
+            dispSem[dispatcherID].release();
+            return;
+        }
 
         //Update remaining tasks
         Task.remainingTasksSem.acquire();
 
         Task.remainingTasks--;
         Task.remainingTasksSem.release();
-        //Let dispatcher work on another process
         dispSem[dispatcherID].release();
     }
 
@@ -263,9 +269,9 @@ public class Dispatcher implements Runnable {
             // Use one algorithm to choose task to run
             //FCFS(readyQueue, dispID);
             try {
-                //RR(readyQueue, dispID, quantumTime);
+                RR(readyQueue, dispID, quantumTime);
                 //PSJF(readyQueue, dispID);
-                NSJF(readyQueue, dispID);
+                //NSJF(readyQueue, dispID);
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
