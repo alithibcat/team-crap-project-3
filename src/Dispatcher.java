@@ -13,6 +13,7 @@ public class Dispatcher implements Runnable {
     private final int dispID;
 
     static int C;
+    static int quantumTime;
 
     public Dispatcher(int dispID) {
         this.dispID = dispID;
@@ -60,8 +61,50 @@ public class Dispatcher implements Runnable {
         dispSem[dispID].release();
     }
 
-    private static void RR() {
+    private static void RR(ArrayList<Task> readyQueue, int dispatcherID, int quantumTime) throws InterruptedException {
+        RQ.acquire();
 
+        if (readyQueue.isEmpty()) {
+            RQ.release();
+            dispSem[dispatcherID].release();
+            return;
+        }
+
+        // Get first task on ready queue, remove task from ready queue,
+        // run the task of quantum Time
+
+        // grab the task ID
+        int taskID = readyQueue.get(0).getTaskID();
+        // grab the task Burst time
+        int taskMB = readyQueue.get(0).getRemainingBurst();
+        Task t = readyQueue.remove(0);
+        RQ.release();
+
+        //Task Start, stops when quantum Time is completed
+
+        System.out.println("Dispatcher " + dispatcherID + " | Running process " + taskID);
+        System.out.println("Process " + taskID + "   | On CPU: MB=" + taskMB
+                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
+        for(int i = 0; i < quantumTime; i++){
+            if (t.getRemainingBurst() >  0){
+                //Starting the task, releasing each one
+                Task.taskStart[taskID].release();
+
+                //Task Finish
+                Task.taskFinished[taskID].acquire();
+            }
+        }
+
+        //Add Task back to the Ready Queue if it isn't finish
+        readyQueue.add(t);
+
+        //Update remaining tasks
+        Task.remainingTasksSem.acquire();
+
+        Task.remainingTasks--;
+        Task.remainingTasksSem.release();
+        //Let dispatcher work on another process
+        dispSem[dispatcherID].release();
     }
 
     private static void NSJF() {
@@ -128,7 +171,12 @@ public class Dispatcher implements Runnable {
             Task.remainingTasksSem.release();
 
             // Use one algorithm to choose task to run
-            FCFS(readyQueue, dispID);
+            //FCFS(readyQueue, dispID);
+            try {
+                RR(readyQueue, dispID, quantumTime);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         try { // Print when all dispatchers have finished
