@@ -107,8 +107,46 @@ public class Dispatcher implements Runnable {
         dispSem[dispatcherID].release();
     }
 
-    private static void NSJF() {
+    private static void NSJF(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
+        try { // Acquire Ready Queue
+            RQ.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if (readyQueue.isEmpty()) {
+            RQ.release();
+            dispSem[dispID].release();
+            return;
+        }
 
+        //find the task with the shortest burst time
+        Task shortestTask = readyQueue.get(0);
+        for (int i = 0; i < readyQueue.size(); i++){
+            if (readyQueue.get(i).getRemainingBurst() < shortestTask.getRemainingBurst()){
+                shortestTask = readyQueue.get(i);
+            }
+        }
+        int taskID = shortestTask.getTaskID();
+        int taskMB = shortestTask.getMaxBurst();
+        readyQueue.remove(shortestTask);
+        RQ.release();
+        System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
+                + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
+                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
+
+        while(shortestTask.getRemainingBurst() > 0){
+            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (shortestTask.getMaxBurst() - shortestTask.getRemainingBurst() + 1));
+            //task start
+            shortestTask.taskStart[taskID].release();
+
+            //task finish
+            shortestTask.taskFinished[taskID].acquire();
+
+        }
+        Task.remainingTasksSem.acquire();
+        Task.remainingTasks--;
+        Task.remainingTasksSem.release();
+        dispSem[dispID].release(); // Task finished normally
     }
 
     private static void PSJF(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
@@ -213,11 +251,17 @@ public class Dispatcher implements Runnable {
             Task.remainingTasksSem.release();
 
             // Use one algorithm to choose task to run
-            //FCFS(readyQueue, dispID);
+            /*FCFS(readyQueue, dispID);
             try {
                 PSJF(readyQueue, dispID);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
+            }
+             */
+            try {
+                NSJF(readyQueue, dispID);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             //try {
             //    RR(readyQueue, dispID, quantumTime);

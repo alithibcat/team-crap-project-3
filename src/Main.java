@@ -6,7 +6,7 @@ public class Main {
 
         //thread creation and population of RQ by Collin
         int T = 5;//(int) (Math.random() * (25 - 1) + 1); // Number Task Threads
-        int C = 1; // Number Cores
+        int C = 4; // Number Cores
         int quantumTime = 3; // Quantum Time
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
