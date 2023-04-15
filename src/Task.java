@@ -9,13 +9,11 @@ public class Task implements Runnable{
     private int remainingBurst;
     public static Semaphore[] taskStart;
     public static Semaphore[] taskFinished;
-    private final int arrivalTime;
 
-    public Task(int taskID, int maxBurst, int arrivalTime) {
+    public Task(int taskID, int maxBurst) {
         this.taskID = taskID;
         this.maxBurst = maxBurst;
         this.remainingBurst = maxBurst;
-        this.arrivalTime = (int) (Math.random() * (25 - 1) + 1);
     }
 
     public int getTaskID() {
@@ -32,9 +30,6 @@ public class Task implements Runnable{
 
     @Override
     public void run() {
-        for (int i = 0; i < arrivalTime; i++)
-            Thread.yield();
-        //Dispatcher.readyQueue.add();
         while (remainingBurst > 0) { // While task still needs to run, do a single burst
             try {
                 taskStart[taskID].acquire();
