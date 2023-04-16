@@ -82,6 +82,8 @@ public class Main {
                 A = 0;
             }
             System.out.println("Main thread  | Creating process thread " + i);
+
+            //readyQueue.add(task);
             // If PSJF, randomize ready queue
             TaskRQAdder taskRQAdder = new TaskRQAdder(i,B,A);
             Thread thread = new Thread(taskRQAdder);
