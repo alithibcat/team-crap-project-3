@@ -294,7 +294,7 @@ public class Dispatcher implements Runnable {
             try {
                 //RR(readyQueue, dispID, quantumTime);
                 //PSJF(readyQueue, dispID);
-                PSJF(readyQueue, dispID);
+                RR(readyQueue, dispID, 3);
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

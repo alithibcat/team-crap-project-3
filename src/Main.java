@@ -2,11 +2,34 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void preemptiveRQ(Semaphore RQ, int T) throws InterruptedException {
+        RQ.acquire();
+        //Start tasks and add them to ready queue
+        for (int i = 0; i < T; i++) {
+            int B = (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
+            int A = (int) (Math.random() * (50 - 1) + 1); // RQ Arrival Time
+            TaskRQAdder taskRQAdder = new TaskRQAdder(i,B,A);
+            Thread thread = new Thread(taskRQAdder);
+            thread.start();
+        }
+        RQ.release();
+    }
+
+    public static void nonPreemptiveRQ(ArrayList<Task> readyQueue, int T) {
+        //Start tasks and add them to ready queue
+        for (int i = 0; i < T; i++) {
+            int B = (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
+            Task task = new Task(i,B);
+            readyQueue.add(task);
+            Thread thread = new Thread(task);
+            thread.start();
+        }
+    }
+    public static void main(String[] args) throws InterruptedException {
 
         //thread creation and population of RQ by Collin
         int T = 5;//(int) (Math.random() * (25 - 1) + 1); // Number Task Threads
-        int C = 1; // Number Cores
+        int C = 4; // Number Cores
         int quantumTime = 3; // Quantum Time
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
@@ -47,14 +70,10 @@ public class Main {
 
         ArrayList<Task> readyQueue = new ArrayList<>();
 
-        //Start tasks and add them to ready queue
-        for (int i = 0; i < T; i++) {
-            int B = (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
-            int A = (int) (Math.random() * (50 - 1) + 1); // RQ Arrival Time
-            TaskRQAdder taskRQAdder = new TaskRQAdder(i,B,A);
-            Thread thread = new Thread(taskRQAdder);
-            thread.start();
-        }
+        // Create tasks and fill readyQueue
+        preemptiveRQ(RQ,T);
+        nonPreemptiveRQ(readyQueue,T);
+
         Dispatcher.readyQueue = readyQueue;
 
         //Start dispatchers
