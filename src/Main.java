@@ -90,7 +90,10 @@ public class Main {
             thread.start();
         }
 
-
+        //Nothing is added to the ready Queue
+        //Therefore a error occurs, confused on the new TaskRQAdder does
+        //Do we make the ready Queue a TaskRQAdder Object and add that?
+        //But within the class, it's added by TaskRQAdder by Paul Chu
         Dispatcher.readyQueue = readyQueue;
 
 //        System.out.println("\n--------------- Ready Queue ---------------");
