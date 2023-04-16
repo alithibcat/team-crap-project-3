@@ -80,12 +80,6 @@ public class Dispatcher implements Runnable {
             return;
         }
 
-        System.out.println("\n--------------- Ready Queue ---------------");
-        for (int i = 0; i < readyQueue.size(); i++)
-            System.out.println("ID:" + readyQueue.get(i).getTaskID() + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:"
-                    + (readyQueue.get(i).getMaxBurst() - readyQueue.get(i).getRemainingBurst()));
-        System.out.println("-------------------------------------------\n");
-
         // Get first task on ready queue, remove task from ready queue,
         // run the task of quantum Time
 
@@ -102,9 +96,9 @@ public class Dispatcher implements Runnable {
                 "| Running RR algorithm, Time Quantum = " + quantumTime);
         System.out.println( "Process " + taskID + "   " +
                 "| On CPU: MB=" + taskMB +
-                ", CB=" + + burstTime +
-                " BT=" + taskMB + ", " +
-                "BG=" + (taskMB + quantumTime));
+                ", CB=" + (taskMB - t.getRemainingBurst()) +
+                ", BT=" + t.getBurstTime() + ", " +
+                ", BG=" + (taskMB - t.getRemainingBurst() + quantumTime));
         for(int i = 0; i < quantumTime; i++){
             if (t.getRemainingBurst() >  0){
                 System.out.println("Process " + taskID + "   | Using CPU " + dispatcherID + "; On burst " + (i+1));
@@ -115,7 +109,6 @@ public class Dispatcher implements Runnable {
                 Task.taskFinished[taskID].acquire();
             }
         }
-
 
         //Add Task back to the Ready Queue if it isn't finish
         //Add Task back to the Ready Queue if it isn't finish
@@ -172,7 +165,7 @@ public class Dispatcher implements Runnable {
                 + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
 
         while(shortestTask.getRemainingBurst() > 0){
-            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (shortestTask.getMaxBurst() - shortestTask.getRemainingBurst() + 1));
+            System.out.println("Process " + taskID + "   | Using CPU " + dispID + "; On burst " + (taskMB - shortestTask.getRemainingBurst() + 1));
             //task start
             shortestTask.taskStart[taskID].release();
 

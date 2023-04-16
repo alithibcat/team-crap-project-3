@@ -41,6 +41,8 @@ public class Task implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            if (remainingBurst % Dispatcher.quantumTime == 0)
+                burstTime++;
             remainingBurst--;
             taskFinished[taskID].release();
         }

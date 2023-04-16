@@ -25,6 +25,11 @@ public class Main {
             Thread thread = new Thread(task);
             thread.start();
         }
+        System.out.println("\n--------------- Ready Queue ---------------");
+        for (int i = 0; i < readyQueue.size(); i++)
+            System.out.println("ID:" + readyQueue.get(i).getTaskID() + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:"
+                    + (readyQueue.get(i).getMaxBurst() - readyQueue.get(i).getRemainingBurst()));
+        System.out.println("-------------------------------------------\n");
     }
     public static void main(String[] args) throws InterruptedException {
 
