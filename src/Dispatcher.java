@@ -14,7 +14,8 @@ public class Dispatcher implements Runnable {
     private final int algorithm;
     static int C;
     static int quantumTime;
-    static int burstTime = 0;
+    static int burstGoal = 0;
+
 
     public Dispatcher(int dispID, int algorithm) {
         this.dispID = dispID;
@@ -115,7 +116,6 @@ public class Dispatcher implements Runnable {
             }
         }
 
-        burstTime++;
 
         //Add Task back to the Ready Queue if it isn't finish
         //Add Task back to the Ready Queue if it isn't finish

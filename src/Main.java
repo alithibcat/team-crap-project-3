@@ -3,6 +3,29 @@ import java.util.concurrent.Semaphore;
 
 public class Main {
     private static String quantumString;
+    public static void preemptiveRQ(Semaphore RQ, int T) throws InterruptedException {
+        RQ.acquire();
+        //Start tasks and add them to ready queue
+        for (int i = 0; i < T; i++) {
+            int B = (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
+            int A = (int) (Math.random() * (50 - 1) + 1); // RQ Arrival Time
+            TaskRQAdder taskRQAdder = new TaskRQAdder(i,B,A);
+            Thread thread = new Thread(taskRQAdder);
+            thread.start();
+        }
+        RQ.release();
+    }
+
+    public static void nonPreemptiveRQ(ArrayList<Task> readyQueue, int T) {
+        //Start tasks and add them to ready queue
+        for (int i = 0; i < T; i++) {
+            int B = (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
+            Task task = new Task(i,B);
+            readyQueue.add(task);
+            Thread thread = new Thread(task);
+            thread.start();
+        }
+    }
     public static void main(String[] args) throws InterruptedException {
 
         if (args.length == 5){
@@ -71,39 +94,12 @@ public class Main {
 
         ArrayList<Task> readyQueue = new ArrayList<>();
 
-        RQ.acquire();
+        if(algorithm == 4)
+            preemptiveRQ(RQ,T);
+        else
+            nonPreemptiveRQ(readyQueue,T);
 
-        //Start tasks and add them to ready queue
-        for (int i = 0; i < T; i++) {
-            int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
-            int A;
-            if (algorithm == 4){
-                A =  (int) (Math.random() * (50 - 1) + 1); // RQ Arrival Time;
-            }
-            else {
-                A = 0;
-            }
-            System.out.println("Main thread  | Creating process thread " + i);
-
-            //readyQueue.add(task);
-            // If PSJF, randomize ready queue
-            TaskRQAdder taskRQAdder = new TaskRQAdder(i,B,A);
-            Thread thread = new Thread(taskRQAdder);
-            thread.start();
-        }
-
-        RQ.release();
-
-        //Nothing is added to the ready Queue
-        //Therefore a error occurs, confused on the new TaskRQAdder does
-        //Do we make the ready Queue a TaskRQAdder Object and add that?
-        //But within the class, it's added by TaskRQAdder by Paul Chu
         Dispatcher.readyQueue = readyQueue;
-
-//        System.out.println("\n--------------- Ready Queue ---------------");
-//        for (int i = 0; i < T; i++)
-//            System.out.println("ID:" + i + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:0");
-//        System.out.println("-------------------------------------------\n");
 
         //Start dispatchers
         for (int i = 0; i < C; i++) {
@@ -173,9 +169,10 @@ public class Main {
                 System.out.println("RR Algorithm Starting");
                 setup(1, 2, quantumString);
                 break;
-            case "-S 2":                                 //?????????????????????????????If RR is given with no quantum time and no Core amount
+            case "-S 2":
                 System.out.println("RR Algorithm Starting");
-                setup(1, 2, "2");
+                System.out.println("Quantum Time is default to 10, if no user input is specified");
+                setup(1, 2, "10");
                 break;
             case "-S 2 2 -C 2":
             case "-S 2 3 -C 2":

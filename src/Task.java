@@ -6,6 +6,7 @@ public class Task implements Runnable{
     public static int[] currentDispID;
     public final int taskID;
     public final int maxBurst;
+    public int burstTime;
     private int remainingBurst;
     public static Semaphore[] taskStart;
     public static Semaphore[] taskFinished;
@@ -26,6 +27,10 @@ public class Task implements Runnable{
 
     public int getRemainingBurst() {
         return remainingBurst;
+    }
+
+    public int getBurstTime(){
+        return burstTime;
     }
 
     @Override
