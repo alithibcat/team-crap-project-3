@@ -34,12 +34,6 @@ public class Dispatcher implements Runnable {
             return;
         }
 
-        System.out.println("\n--------------- Ready Queue ---------------");
-        for (int i = 0; i < readyQueue.size(); i++)
-            System.out.println("ID:" + readyQueue.get(i).getTaskID() + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:"
-                    + (readyQueue.get(i).getMaxBurst() - readyQueue.get(i).getRemainingBurst()));
-        System.out.println("-------------------------------------------\n");
-
         // Get first task on ready queue, remove task from ready queue, start and finish task
         int taskID = readyQueue.get(0).getTaskID(); // grab the task ID
         int taskMB = readyQueue.get(0).getMaxBurst(); // grab the task Burst time
@@ -86,7 +80,7 @@ public class Dispatcher implements Runnable {
         // grab the task ID
         int taskID = readyQueue.get(0).getTaskID();
         // grab the task Burst time
-        int taskMB = readyQueue.get(0).getRemainingBurst();
+        int taskMB = readyQueue.get(0).getMaxBurst();
         Task t = readyQueue.remove(0);
         RQ.release();
 
@@ -96,12 +90,12 @@ public class Dispatcher implements Runnable {
                 "| Running RR algorithm, Time Quantum = " + quantumTime);
         System.out.println( "Process " + taskID + "   " +
                 "| On CPU: MB=" + taskMB +
-                ", CB=" + (taskMB - t.getRemainingBurst()) +
+                ", CB=" + (1 + taskMB - t.getRemainingBurst()) +
                 ", BT=" + t.getBurstTime() + ", " +
                 ", BG=" + (taskMB - t.getRemainingBurst() + quantumTime));
         for(int i = 0; i < quantumTime; i++){
             if (t.getRemainingBurst() >  0){
-                System.out.println("Process " + taskID + "   | Using CPU " + dispatcherID + "; On burst " + (i+1));
+                System.out.println("Process " + taskID + "   | Using CPU " + dispatcherID + "; On burst " + (1 + t.getMaxBurst()-t.getRemainingBurst()));
                 //Starting the task, releasing each one
                 Task.taskStart[taskID].release();
 
@@ -141,12 +135,6 @@ public class Dispatcher implements Runnable {
             dispSem[dispID].release();
             return;
         }
-
-        System.out.println("\n--------------- Ready Queue ---------------");
-        for (int i = 0; i < readyQueue.size(); i++)
-            System.out.println("ID:" + readyQueue.get(i).getTaskID() + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:"
-                    + (readyQueue.get(i).getMaxBurst() - readyQueue.get(i).getRemainingBurst()));
-        System.out.println("-------------------------------------------\n");
 
         //find the task with the shortest burst time
         Task shortestTask = readyQueue.get(0);
@@ -204,7 +192,7 @@ public class Dispatcher implements Runnable {
 
         System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
                 + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
-                + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
+                + ", CB=" + (1 + shortestTask.getMaxBurst() - shortestTask.getRemainingBurst()) + ", BT=" + taskMB + ", BG=" + taskMB);
 
         boolean bool = false;
         while(shortestTask.getRemainingBurst() > 0){
