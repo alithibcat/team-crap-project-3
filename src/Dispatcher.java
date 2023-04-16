@@ -11,12 +11,14 @@ public class Dispatcher implements Runnable {
     static Semaphore barrierMutex2;
     static Semaphore barrierSemHold2;
     private final int dispID;
+    private final int algorithm;
 
     static int C;
     static int quantumTime;
 
-    public Dispatcher(int dispID) {
+    public Dispatcher(int dispID, int algorithm) {
         this.dispID = dispID;
+        this.algorithm = algorithm;
     }
 
     private static void FCFS(ArrayList<Task> readyQueue, int dispID) {
@@ -114,7 +116,15 @@ public class Dispatcher implements Runnable {
         }
 
         //Add Task back to the Ready Queue if it isn't finish
-        readyQueue.add(t);
+        //Add Task back to the Ready Queue if it isn't finish
+        if(t.getRemainingBurst() > 0){
+            RQ.acquire();
+            readyQueue.add(t);
+            RQ.release();
+            //Let dispatcher work on another process
+            dispSem[dispatcherID].release();
+            return;
+        }
 
         //Update remaining tasks
         Task.remainingTasksSem.acquire();
@@ -270,7 +280,7 @@ public class Dispatcher implements Runnable {
             throw new RuntimeException(e);
         }
         //System.out.println("Dispatcher " + dispID + " | Running FCFS algorithm");
-        System.out.println("Dispatcher " + dispID + " | Running RR algorithm, Time Quantum = " + quantumTime);
+        //System.out.println("Dispatcher " + dispID + " | Running RR algorithm, Time Quantum = " + quantumTime);
         while(true) {
             try { // Start this dispatcher
                 dispSem[dispID].acquire();
@@ -290,14 +300,33 @@ public class Dispatcher implements Runnable {
             Task.remainingTasksSem.release();
 
             // Use one algorithm to choose task to run
-            //FCFS(readyQueue, dispID);
-            try {
-                //RR(readyQueue, dispID, quantumTime);
-                //PSJF(readyQueue, dispID);
-                PSJF(readyQueue, dispID);
-
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            switch (algorithm){
+                case 1:
+                    FCFS(readyQueue, dispID);
+                    break;
+                case 2:
+                    try {
+                        RR(readyQueue, dispID, quantumTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 3:
+                    try {
+                        NSJF(readyQueue, dispID);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 4:
+                    try {
+                        PSJF(readyQueue, dispID);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    System.out.println("Something went wrong");
             }
         }
 

@@ -2,12 +2,36 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class Main {
+    private static String quantumString;
     public static void main(String[] args) {
 
+        if (args.length == 5){
+            quantumString = args[2];
+            //round robin executes
+            getParameters(args[0] + " " + args[1] + " " + args[2] + " " + args[3] + " " + args[4]);
+
+        }
+        else if (args.length == 2){
+            //used for inputs where only -S and the selected algorithm are chosen, no core count provided
+            getParameters(args[0] + " " + args[1]);
+        }
+        else if (args.length == 3){
+            quantumString = args[2];
+            getParameters(args[0] + " " + args[1] + " " + args[2]);
+        }
+        else {
+            //used for the rest of the algorithms
+            getParameters(args[0] + " " + args[1] + " " + args[2] + " " + args[3]);
+        }
+
+    }
+
+
+    public static void setup(int cores, int algorithm, String quantumString){
         //thread creation and population of RQ by Collin
-        int T = 5;//(int) (Math.random() * (25 - 1) + 1); // Number Task Threads
-        int C = 1; // Number Cores
-        int quantumTime = 3; // Quantum Time
+        int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
+        int C = cores; // Number Cores
+        int quantumTime = Integer.parseInt(quantumString); // Quantum Time
         System.out.println("Task Threads: " + T + "\nCores: " + C);
 
         int[] currentDispID = new int[T];
@@ -49,20 +73,207 @@ public class Main {
 
         //Start tasks and add them to ready queue
         for (int i = 0; i < T; i++) {
-            int B = (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
-            int A = (int) (Math.random() * (50 - 1) + 1); // RQ Arrival Time
+            int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
+            int A;
+            if (algorithm == 4){
+                A =  (int) (Math.random() * (50 - 1) + 1); // RQ Arrival Time;
+            }
+            else {
+                A = 0;
+            }
+            System.out.println("Main thread  | Creating process thread " + i);
+            // If PSJF, randomize ready queue
             TaskRQAdder taskRQAdder = new TaskRQAdder(i,B,A);
             Thread thread = new Thread(taskRQAdder);
             thread.start();
         }
         Dispatcher.readyQueue = readyQueue;
 
+        System.out.println("\n--------------- Ready Queue ---------------");
+        for (int i = 0; i < T; i++)
+            System.out.println("ID:" + i + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:0");
+        System.out.println("-------------------------------------------\n");
+
         //Start dispatchers
         for (int i = 0; i < C; i++) {
             System.out.println("Main thread  | Forking dispatcher " + i + "\nDispatcher " + i + " | Using CPU " + i);
-            Dispatcher disp = new Dispatcher(i);
+            Dispatcher disp = new Dispatcher(i, algorithm);
             Thread thread = new Thread(disp);
             thread.start();
         }
     }
+
+
+
+    public static void getParameters(String parameter){
+        switch (parameter){
+            case "-S 1 -C 1":
+            case "-C 1 -S 1":
+            case "-S 1":
+                //setup
+                System.out.println("FCFS Algorithm Starting");
+                setup(1, 1, "2");
+                break;
+            case "-S 1 -C 2":
+            case "-C 2 -S 1":
+                //setup
+                System.out.println("FCFS Algorithm Starting");
+                setup(2, 1, "2");
+                break;
+            case "-S 1 -C 3":
+            case "-C 3 -S 1":
+                System.out.println("FCFS Algorithm Starting");
+                setup(3, 1, "2");
+                break;
+            case "-S 1 -C 4":
+            case "-C 4 -S 1":
+                //setup
+                System.out.println("FCFS Algorithm Starting");
+                setup(4, 1, "2");
+                break;
+            case "-S 2 2 -C 1":
+            case "-S 2 3 -C 1":
+            case "-S 2 4 -C 1":
+            case "-S 2 5 -C 1":
+            case "-S 2 6 -C 1":
+            case "-S 2 7 -C 1":
+            case "-S 2 8 -C 1":
+            case "-S 2 9 -C 1":
+            case "-S 2 10 -C 1":
+            case "-C 1 2 -S 2":
+            case "-C 1 3 -S 2":
+            case "-C 1 4 -S 2":
+            case "-C 1 5 -S 2":
+            case "-C 1 6 -S 2":
+            case "-C 1 7 -S 2":
+            case "-C 1 8 -S 2":
+            case "-C 1 9 -S 2":
+            case "-C 1 10 -S 2":
+            case "-S 2 2":
+            case "-S 2 3":
+            case "-S 2 4":
+            case "-S 2 5":
+            case "-S 2 6":
+            case "-S 2 7":
+            case "-S 2 8":
+            case "-S 2 9":
+            case "-S 2 10":
+                //setup
+                System.out.println("RR Algorithm Starting");
+                setup(1, 2, quantumString);
+                break;
+            case "-S 2":                                 //?????????????????????????????If RR is given with no quantum time and no Core amount
+                System.out.println("RR Algorithm Starting");
+                setup(1, 2, "2");
+                break;
+            case "-S 2 2 -C 2":
+            case "-S 2 3 -C 2":
+            case "-S 2 4 -C 2":
+            case "-S 2 5 -C 2":
+            case "-S 2 6 -C 2":
+            case "-S 2 7 -C 2":
+            case "-S 2 8 -C 2":
+            case "-S 2 9 -C 2":
+            case "-S 2 10 -C 2":
+            case "-C 2 2 -S 2":
+            case "-C 2 3 -S 2":
+            case "-C 2 4 -S 2":
+            case "-C 2 5 -S 2":
+            case "-C 2 6 -S 2":
+            case "-C 2 7 -S 2":
+            case "-C 2 8 -S 2":
+            case "-C 2 9 -S 2":
+            case "-C 2 10 -S 2":
+                //setup
+                System.out.println("RR Algorithm Starting");
+                setup(2, 2, quantumString);
+                break;
+            case "-S 2 2 -C 3":
+            case "-S 2 3 -C 3":
+            case "-S 2 4 -C 3":
+            case "-S 2 5 -C 3":
+            case "-S 2 6 -C 3":
+            case "-S 2 7 -C 3":
+            case "-S 2 8 -C 3":
+            case "-S 2 9 -C 3":
+            case "-S 2 10 -C 3":
+            case "-C 3 2 -S 2":
+            case "-C 3 3 -S 2":
+            case "-C 3 4 -S 2":
+            case "-C 3 5 -S 2":
+            case "-C 3 6 -S 2":
+            case "-C 3 7 -S 2":
+            case "-C 3 8 -S 2":
+            case "-C 3 9 -S 2":
+            case "-C 3 10 -S 2":
+                //setup
+                System.out.println("RR Algorithm Starting");
+                setup(3, 2, quantumString);
+                break;
+            case "-S 2 2 -C 4":
+            case "-S 2 3 -C 4":
+            case "-S 2 4 -C 4":
+            case "-S 2 5 -C 4":
+            case "-S 2 6 -C 4":
+            case "-S 2 7 -C 4":
+            case "-S 2 8 -C 4":
+            case "-S 2 9 -C 4":
+            case "-S 2 10 -C 4":
+            case "-C 4 2 -S 2":
+            case "-C 4 3 -S 2":
+            case "-C 4 4 -S 2":
+            case "-C 4 5 -S 2":
+            case "-C 4 6 -S 2":
+            case "-C 4 7 -S 2":
+            case "-C 4 8 -S 2":
+            case "-C 4 9 -S 2":
+            case "-C 4 10 -S 2":
+                //setup
+                System.out.println("RR Algorithm Starting");
+                setup(4, 2, quantumString);
+                break;
+            case "-S 3 -C 1":
+            case "-C 1 -S 3":
+            case "-S 3":
+                //setup
+                System.out.println("Non-preemptive Shortest Job First Algorithm Starting");
+                setup(1, 3, "2");
+                break;
+            case "-S 3 -C 2":
+            case "-C 2 -S 3":
+                //setup
+                System.out.println("Non-preemptive Shortest Job First Algorithm Starting");
+                setup(2, 3, "2");
+                break;
+            case "-S 3 -C 3":
+            case "-C 3 -S 3":
+                //setup
+                System.out.println("Non-preemptive Shortest Job First Algorithm Starting");
+                setup(3, 3, "2");
+                break;
+            case "-S 3 -C 4":
+            case "-C 4 -S 3":
+                System.out.println("Non-preemptive Shortest Job First Algorithm Starting");
+                setup(4, 3, "2");
+                break;
+            case "-S 4 -C 1":
+            case "-S 4 -C 2":
+            case "-S 4 -C 3":
+            case "-S 4 -C 4":
+            case "-C 1 -S 4":
+            case "-C 2 -S 4":
+            case "-C 3 -S 4":
+            case "-C 4 -S 4":
+            case "-S 4":
+                //setup
+                System.out.println("Preemptive Shortest Job First Algorithm Starting");
+                setup(1, 4, "2");
+                break;
+            default:
+                System.out.println("\nYou did not enter an accepted parameter. Please enter your inputs in an accepted format.");
+
+
+        }
+    }
+
 }
