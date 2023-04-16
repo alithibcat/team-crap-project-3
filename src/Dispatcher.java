@@ -12,9 +12,9 @@ public class Dispatcher implements Runnable {
     static Semaphore barrierSemHold2;
     private final int dispID;
     private final int algorithm;
-
     static int C;
     static int quantumTime;
+    static int burstTime = 0;
 
     public Dispatcher(int dispID, int algorithm) {
         this.dispID = dispID;
@@ -97,13 +97,13 @@ public class Dispatcher implements Runnable {
 
         //Task Start, stops when quantum Time is completed
 
-        System.out.println( "Dispatcher " + dispatcherID + " " +
-                "| Running process " + taskID);
+        System.out.println( "Dispatcher " + dispatcherID + " \t" +
+                "| Running RR algorithm, Time Quantum = " + quantumTime);
         System.out.println( "Process " + taskID + "   " +
                 "| On CPU: MB=" + taskMB +
-                ", CB=0, " +
-                "BT=" + taskMB + ", " +
-                "BG=" + taskMB);
+                ", CB=" + + burstTime +
+                " BT=" + taskMB + ", " +
+                "BG=" + (taskMB + quantumTime));
         for(int i = 0; i < quantumTime; i++){
             if (t.getRemainingBurst() >  0){
                 System.out.println("Process " + taskID + "   | Using CPU " + dispatcherID + "; On burst " + (i+1));
@@ -114,6 +114,8 @@ public class Dispatcher implements Runnable {
                 Task.taskFinished[taskID].acquire();
             }
         }
+
+        burstTime++;
 
         //Add Task back to the Ready Queue if it isn't finish
         //Add Task back to the Ready Queue if it isn't finish

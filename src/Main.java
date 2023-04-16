@@ -3,7 +3,7 @@ import java.util.concurrent.Semaphore;
 
 public class Main {
     private static String quantumString;
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         if (args.length == 5){
             quantumString = args[2];
@@ -27,7 +27,7 @@ public class Main {
     }
 
 
-    public static void setup(int cores, int algorithm, String quantumString){
+    public static void setup(int cores, int algorithm, String quantumString) throws InterruptedException {
         //thread creation and population of RQ by Collin
         int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
         int C = cores; // Number Cores
@@ -71,6 +71,8 @@ public class Main {
 
         ArrayList<Task> readyQueue = new ArrayList<>();
 
+        RQ.acquire();
+
         //Start tasks and add them to ready queue
         for (int i = 0; i < T; i++) {
             int B =  (int) (Math.random() * (50 - 1) + 1); // Max Burst Time
@@ -89,6 +91,8 @@ public class Main {
             Thread thread = new Thread(taskRQAdder);
             thread.start();
         }
+
+        RQ.release();
 
         //Nothing is added to the ready Queue
         //Therefore a error occurs, confused on the new TaskRQAdder does
@@ -112,7 +116,7 @@ public class Main {
 
 
 
-    public static void getParameters(String parameter){
+    public static void getParameters(String parameter) throws InterruptedException {
         switch (parameter){
             case "-S 1 -C 1":
             case "-C 1 -S 1":
