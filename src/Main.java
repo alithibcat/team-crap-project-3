@@ -89,12 +89,14 @@ public class Main {
             Thread thread = new Thread(taskRQAdder);
             thread.start();
         }
+
+
         Dispatcher.readyQueue = readyQueue;
 
-        System.out.println("\n--------------- Ready Queue ---------------");
-        for (int i = 0; i < T; i++)
-            System.out.println("ID:" + i + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:0");
-        System.out.println("-------------------------------------------\n");
+//        System.out.println("\n--------------- Ready Queue ---------------");
+//        for (int i = 0; i < T; i++)
+//            System.out.println("ID:" + i + ", Max Burst:" + readyQueue.get(i).getMaxBurst() + ", Current Burst:0");
+//        System.out.println("-------------------------------------------\n");
 
         //Start dispatchers
         for (int i = 0; i < C; i++) {
