@@ -245,8 +245,6 @@ public class Dispatcher implements Runnable {
             for (int i = 0; i < C; i++)
                 barrierSemHold.release();
             System.out.println("\nAll Dispatchers are DONE!");
-            Date end = new Date();
-            System.out.println("\nTime taken in milli seconds: " + (end.getTime() - start.getTime()));
             barrierMutex.release();
         } else {
             barrierMutex.release();
