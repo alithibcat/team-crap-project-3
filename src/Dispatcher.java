@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.Semaphore;
 public class Dispatcher implements Runnable {
     static ArrayList<Task> readyQueue;
@@ -147,7 +148,7 @@ public class Dispatcher implements Runnable {
         int taskMB = shortestTask.getMaxBurst();
         readyQueue.remove(shortestTask);
 
-
+        RQ.release();
         System.out.println("\nDispatcher " + dispID + " | Running process " + taskID
                 + "\nProcess " + taskID + "   | On CPU: MB=" + taskMB
                 + ", CB=0, BT=" + taskMB + ", BG=" + taskMB);
@@ -161,7 +162,6 @@ public class Dispatcher implements Runnable {
             shortestTask.taskFinished[taskID].acquire();
 
         }
-        RQ.release();
         Task.remainingTasksSem.acquire();
         Task.remainingTasks--;
         Task.remainingTasksSem.release();
@@ -213,14 +213,11 @@ public class Dispatcher implements Runnable {
 
             //task finish
             shortestTask.taskFinished[shortestTask.getTaskID()].acquire();
-            if (shortestTask.getRemainingBurst() < 1) {
-                Task.remainingTasksSem.acquire();
-                Task.remainingTasks--;
-                Task.remainingTasksSem.release();
-                dispSem[dispID].release();
-                return;
-            }
+
         }
+        Task.remainingTasksSem.acquire();
+        Task.remainingTasks--;
+        Task.remainingTasksSem.release();
         dispSem[dispID].release(); // Task finished normally
     }
 
@@ -248,6 +245,8 @@ public class Dispatcher implements Runnable {
             for (int i = 0; i < C; i++)
                 barrierSemHold.release();
             System.out.println("\nAll Dispatchers are DONE!");
+            Date end = new Date();
+            System.out.println("\nTime taken in milli seconds: " + (end.getTime() - start.getTime()));
             barrierMutex.release();
         } else {
             barrierMutex.release();
