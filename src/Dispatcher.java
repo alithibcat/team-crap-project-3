@@ -23,6 +23,7 @@ public class Dispatcher implements Runnable {
         this.algorithm = algorithm;
     }
 
+    // Begin code changes by Alison, Paul
     private static void FCFS(ArrayList<Task> readyQueue, int dispID) {
         try { // Acquire Ready Queue
             RQ.acquire();
@@ -65,6 +66,7 @@ public class Dispatcher implements Runnable {
         // Let dispatcher work on another process
         dispSem[dispID].release();
     }
+    // End code changes by Alison
 
     private static void RR(ArrayList<Task> readyQueue, int dispatcherID, int quantumTime) throws InterruptedException {
         RQ.acquire();
@@ -124,7 +126,9 @@ public class Dispatcher implements Runnable {
         //Let dispatcher work on another process
         dispSem[dispatcherID].release();
     }
+    // End code changes by Paul
 
+    // Begin code changes by Randon
     private static void NSJF(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
         try { // Acquire Ready Queue
             RQ.acquire();
@@ -167,7 +171,9 @@ public class Dispatcher implements Runnable {
         Task.remainingTasksSem.release();
         dispSem[dispID].release(); // Task finished normally
     }
+    // End code changes by Randon
 
+    // Begin code changes by Alison, Collin
     private static void PSJF(ArrayList<Task> readyQueue, int dispID) throws InterruptedException {
         if (readyQueue.isEmpty()) {
             dispSem[dispID].release();
@@ -220,7 +226,7 @@ public class Dispatcher implements Runnable {
         Task.remainingTasksSem.release();
         dispSem[dispID].release(); // Task finished normally
     }
-
+    // End code changes by Collin
 
     public void barrierStart() throws InterruptedException {
         barrierMutex2.acquire();
@@ -236,7 +242,9 @@ public class Dispatcher implements Runnable {
             barrierSemHold2.acquire();
         }
     }
+    // End code changes by Alison
 
+    // Begin code changes by Paul
     public void barrierEnd() throws InterruptedException {
         barrierMutex.acquire();
         barrierThreadCount++;
@@ -251,7 +259,9 @@ public class Dispatcher implements Runnable {
             barrierSemHold.acquire();
         }
     }
+    // End code changes by Paul
 
+    // Begin code changes by Randon, Alison
     @Override
     public void run() {
         try { // Release dispatchers once all have been forked
@@ -316,4 +326,5 @@ public class Dispatcher implements Runnable {
             throw new RuntimeException(e);
         }
     }
+    // End code changes by Randon, Alison
 }

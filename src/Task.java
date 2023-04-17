@@ -17,6 +17,7 @@ public class Task implements Runnable{
         this.remainingBurst = maxBurst;
     }
 
+    // Begin code changes by Paul
     public int getTaskID() {
         return taskID;
     }
@@ -32,7 +33,9 @@ public class Task implements Runnable{
     public int getBurstTime(){
         return burstTime;
     }
+    // End code changes by Paul
 
+    // Begin code changes by Alison
     @Override
     public void run() {
         while (remainingBurst > 0) { // While task still needs to run, do a single burst
@@ -48,3 +51,4 @@ public class Task implements Runnable{
         }
     }
 }
+// End code changes by Alison

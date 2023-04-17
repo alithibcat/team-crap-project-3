@@ -2,7 +2,11 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class Main {
+    // Begin code changes by Randon
     private static String quantumString;
+    // End code changes by Randon
+
+    // Begin code changes by Alison
     public static void preemptiveRQ(Semaphore RQ, int T) throws InterruptedException {
         RQ.acquire();
         //Start tasks and add them to ready queue
@@ -31,6 +35,9 @@ public class Main {
                     + (readyQueue.get(i).getMaxBurst() - readyQueue.get(i).getRemainingBurst()));
         System.out.println("-------------------------------------------\n");
     }
+    // End code changes by Alison
+
+    // Begin code changes by Randon
     public static void main(String[] args) throws InterruptedException {
 
         if (args.length == 5){
@@ -53,8 +60,9 @@ public class Main {
         }
 
     }
+    // End code changes by Randon
 
-
+    // Begin code changes by Paul, Randon, Alison
     public static void setup(int cores, int algorithm, String quantumString) throws InterruptedException {
         //thread creation and population of RQ by Collin
         int T = (int) (Math.random() * (25 - 1) + 1); // Number Task Threads
@@ -114,7 +122,7 @@ public class Main {
             thread.start();
         }
     }
-
+    // End code changes by Paul, Alison
 
 
     public static void getParameters(String parameter) throws InterruptedException {
@@ -284,9 +292,7 @@ public class Main {
                 break;
             default:
                 System.out.println("\nYou did not enter an accepted parameter. Please enter your inputs in an accepted format.");
-
-
         }
     }
-
+    // End code changes by Randon
 }
